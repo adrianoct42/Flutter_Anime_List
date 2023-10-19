@@ -1,0 +1,16 @@
+1- HOME SCREEN
+    * Boas vindas, além de um botão para ADICIONAR ANIME que leva para essa tela específica.
+    * Uma das BOTTOM NAVIGATOR ITEM leva para essa tela de HOME.
+
+2- LIST SCREEN
+    * Lista os animes já adicionados.
+    * Caso não haja nenhum, coloque uma mensagem para o usuário que ainda não há nenhum adicionado.
+    * Uma das BOTTOM NAVIGATOR ITEM leva para essa tela de LIST.
+
+3- ADD ANIME
+    * Tela para adicionar uma obra com todos os seus campos.
+    * Faça qualquer checagem de erro antes de mandá-lo pro Hive.
+
+4- EDIT ANIME
+    * Acessível através da página de LIST SCREEN.
+    * Muito semelhante ao ADD ANIME, mas edita uma entry já adicionada, provavelmente faríamos isso passando um "ID" específico?
