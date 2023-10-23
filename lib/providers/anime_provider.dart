@@ -6,6 +6,7 @@ import "package:hive/hive.dart";
 class AnimeProvider extends ChangeNotifier {
   Box box = Hive.box("animebox");
   List<AnimeModel> animes = <AnimeModel>[];
+  bool favorite = false;
 
   void getFavoritos() {
     var lista = box.values.cast<AnimeModel>().toList();

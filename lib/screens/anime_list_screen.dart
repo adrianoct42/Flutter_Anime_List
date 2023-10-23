@@ -105,132 +105,182 @@ class _AnimeListScreenState extends State<AnimeListScreen> {
                         image: AssetImage("assets/LIST.jpg"),
                         fit: BoxFit.cover),
                   ),
-                  child: ListView.builder(
-                    itemCount: animes.length,
-                    itemBuilder: (context, index) {
-                      return Dismissible(
-                        key: UniqueKey(),
-                        onDismissed: (DismissDirection dismissDirection) async {
-                          // o onDismissed já AUTOMATICAMENTE chama um setState
-                          // após sua execução.
-                          hiveDB.excluir(animes[index]);
-                        },
-                        child: InkWell(
-                          onTap: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext bc) {
-                                  return AlertDialog(
-                                    title: const Text(
-                                      "O que deseja fazer?",
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    actionsAlignment: MainAxisAlignment.center,
-                                    backgroundColor: Colors.green[200],
-                                    actions: [
-                                      Column(
-                                        children: [
-                                          const SizedBox(height: 20),
-                                          OutlinedButton(
-                                            style: ButtonStyle(
-                                              shape: MaterialStateProperty.all<
-                                                  RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          18.0),
-                                                ),
-                                              ),
-                                            ),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                              setState(() {
-                                                Get.to(() => EditAnimeScreen(
-                                                    hiveDB, animes[index]));
-                                              });
-                                            },
-                                            child: const Padding(
-                                              padding: EdgeInsets.all(16.0),
-                                              child: Text(
-                                                "Editar",
-                                                style: TextStyle(
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 40),
-                                          OutlinedButton(
-                                              style: ButtonStyle(
-                                                shape:
-                                                    MaterialStateProperty.all<
-                                                        RoundedRectangleBorder>(
-                                                  RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            18.0),
-                                                  ),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                                setState(() {
-                                                  Get.to(() =>
-                                                      AnimeDetailsScreen(
-                                                          animes[index]));
-                                                });
-                                              },
-                                              child: const Padding(
-                                                padding: EdgeInsets.all(16.0),
-                                                child: Text(
-                                                  "Detalhes",
-                                                  style: TextStyle(
-                                                      color: Colors.black),
-                                                ),
-                                              )),
-                                          const SizedBox(height: 40),
-                                        ],
-                                      )
-                                    ],
-                                  );
-                                });
-                          },
-                          child: Card(
-                            elevation: 8,
-                            color: Colors.purple[100],
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24)),
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 12),
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(36),
-                                  child: ListTile(
-                                    title: Text(
-                                      animes[index].name,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16),
-                                    ),
-                                    trailing: Switch(
-                                      activeColor: Colors.amber[100],
-                                      onChanged: (bool value) async {
-                                        animes[index].favorite = value;
-                                        hiveDB.alterar(animes[index]);
-                                        hiveDB.obterAnimes(box, value);
-                                        setState(() {});
-                                      },
-                                      value: animes[index].favorite,
-                                    ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Container(
+                              padding: const EdgeInsets.all(15.0),
+                              decoration: BoxDecoration(
+                                  color: Colors.green[100],
+                                  borderRadius: BorderRadius.circular(12)),
+                              child: Row(
+                                children: [
+                                  const Text(
+                                    "Mostrar somente Favoritos ⭐",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 30),
+                                  Switch(
+                                      activeColor: Colors.amber[100],
+                                      value: animeProvider.favorite,
+                                      onChanged: (bool value) {
+                                        animeProvider.favorite = value;
+                                        setState(() {});
+                                      })
+                                ],
+                              ),
                             ),
                           ),
+                        ],
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: animeProvider.favorite
+                              ? animesFavoritos.length
+                              : animes.length,
+                          itemBuilder: (context, index) {
+                            return Dismissible(
+                              key: UniqueKey(),
+                              onDismissed:
+                                  (DismissDirection dismissDirection) async {
+                                // o onDismissed já AUTOMATICAMENTE chama um setState
+                                // após sua execução.
+                                hiveDB.excluir(animes[index]);
+                                carregarDados();
+                              },
+                              child: InkWell(
+                                onTap: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext bc) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                            "O que deseja fazer?",
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          actionsAlignment:
+                                              MainAxisAlignment.center,
+                                          backgroundColor: Colors.green[200],
+                                          actions: [
+                                            Column(
+                                              children: [
+                                                const SizedBox(height: 20),
+                                                OutlinedButton(
+                                                  style: ButtonStyle(
+                                                    shape: MaterialStateProperty
+                                                        .all<
+                                                            RoundedRectangleBorder>(
+                                                      RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(18.0),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                    setState(() {
+                                                      Get.to(() =>
+                                                          EditAnimeScreen(
+                                                              hiveDB,
+                                                              animes[index]));
+                                                    });
+                                                  },
+                                                  child: const Padding(
+                                                    padding:
+                                                        EdgeInsets.all(16.0),
+                                                    child: Text(
+                                                      "Editar",
+                                                      style: TextStyle(
+                                                          color: Colors.black),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 40),
+                                                OutlinedButton(
+                                                    style: ButtonStyle(
+                                                      shape: MaterialStateProperty
+                                                          .all<
+                                                              RoundedRectangleBorder>(
+                                                        RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      18.0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      setState(() {
+                                                        Get.to(() =>
+                                                            AnimeDetailsScreen(
+                                                                animes[index]));
+                                                      });
+                                                    },
+                                                    child: const Padding(
+                                                      padding:
+                                                          EdgeInsets.all(16.0),
+                                                      child: Text(
+                                                        "Detalhes",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.black),
+                                                      ),
+                                                    )),
+                                                const SizedBox(height: 40),
+                                              ],
+                                            )
+                                          ],
+                                        );
+                                      });
+                                },
+                                child: Card(
+                                  elevation: 8,
+                                  color: Colors.purple[100],
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(24)),
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 12, horizontal: 12),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(36),
+                                        child: ListTile(
+                                          title: Text(
+                                            animes[index].name,
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16),
+                                          ),
+                                          trailing: Switch(
+                                            activeColor: Colors.amber[100],
+                                            onChanged: (bool value) async {
+                                              animes[index].favorite = value;
+                                              hiveDB.alterar(animes[index]);
+                                              // hiveDB.obterAnimes(box, value);
+                                              carregarDados();
+                                              setState(() {});
+                                            },
+                                            value: animes[index].favorite,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
                 ),
         ),
