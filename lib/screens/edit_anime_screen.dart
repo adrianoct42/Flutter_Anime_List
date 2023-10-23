@@ -188,7 +188,7 @@ class _EditAnimeScreenState extends State<EditAnimeScreen> {
                               imgPath == "" ? imagemWeb.text : imgPath;
                           widget.animeEntry.favorite = favorite;
                           widget.hiveDB.alterar(widget.animeEntry);
-                          Get.to(HomeScreen());
+                          Get.to(HomeScreen(0));
                         } else if (imgPath != "" && imagemWeb.text != "") {
                           Get.snackbar("Imagem de duas fontes!",
                               "Por favor, não preencha 2 imagens.\nPreencha UM CAMPO ou OUTRO CAMPO",

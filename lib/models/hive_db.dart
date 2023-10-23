@@ -3,26 +3,20 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
 
 class HiveDB {
-  static late Box _box;
+  HiveDB.criar();
 
-  HiveDB._criar();
-
-  static Future<HiveDB> iniciar() async {
-    if (Hive.isBoxOpen("animebox")) {
-      _box = Hive.box("animebox");
-    } else {
-      _box = await Hive.openBox("animebox");
+  List<AnimeModel> obterAnimes(Box box, bool favorito) {
+    if (favorito) {
+      return box.values
+          .cast<AnimeModel>()
+          .where((element) => element.favorite == true)
+          .toList();
     }
-
-    return HiveDB._criar();
+    return box.values.cast<AnimeModel>().toList();
   }
 
-  List<AnimeModel> obterAnimes() {
-    return _box.values.cast<AnimeModel>().toList();
-  }
-
-  void salvar(AnimeModel animeModel) {
-    _box.add(animeModel);
+  void salvar(Box box, AnimeModel animeModel) {
+    box.add(animeModel);
   }
 
   alterar(AnimeModel animeModel) {

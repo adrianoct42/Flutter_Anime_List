@@ -1,58 +1,68 @@
 import 'package:animelistapp/models/anime_model.dart';
 import 'package:animelistapp/models/hive_db.dart';
-import 'package:animelistapp/screens/anime_list.dart';
+import 'package:animelistapp/screens/anime_list_screen.dart';
 import 'package:animelistapp/screens/new_anime_screen.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive_flutter/adapters.dart';
+import 'package:hive/hive.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  HomeScreen(this.selectedIndex, {Key? key}) : super(key: key);
+
+  int selectedIndex;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Box boxAnime;
-  late HiveDB hiveDB;
-  var _animes = <AnimeModel>[];
-
+  PageController controllerPageView = PageController(initialPage: 0);
   @override
   void initState() {
-    carregarDados();
+    abreCaixa();
     super.initState();
   }
 
-  void carregarDados() async {
-    // Checa se a box existe ou está aberta, e abre caso não esteja:
-    hiveDB = await HiveDB.iniciar();
-    _animes = hiveDB.obterAnimes();
+  void abreCaixa() async {
+    if (Hive.isBoxOpen("animebox")) {
+      Hive.box("animebox");
+    } else {
+      await Hive.openBox("animebox");
+    }
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      widget.selectedIndex = index;
+      if (widget.selectedIndex == 0) {
+        Get.to(() => HomeScreen(widget.selectedIndex));
+        setState(() {});
+      } else if (widget.selectedIndex == 1) {
+        Get.to(() => AnimeListScreen(widget.selectedIndex));
+        setState(() {});
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        bottomNavigationBar: ConvexAppBar(
-          backgroundColor: Colors.teal,
-          initialActiveIndex: 0,
-          items: const [
-            TabItem(icon: Icons.home, title: "Home"),
-            TabItem(icon: Icons.list_alt, title: "Anime List")
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: widget.selectedIndex,
+          selectedItemColor: Colors.teal[200],
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt),
+              label: 'Anime List',
+            ),
           ],
-          onTap: (index) {
-            if (index == 0) {
-              setState(() {
-                Get.to(() => HomeScreen());
-              });
-            } else if (index == 1) {
-              setState(() {
-                Get.to(() => AnimeListScreen(hiveDB, _animes));
-              });
-            }
-          },
+          onTap: _onItemTapped,
         ),
         body: Container(
           constraints: const BoxConstraints.expand(),
@@ -69,14 +79,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(15.0),
                   decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.amberAccent[100],
                       borderRadius: BorderRadius.circular(12)),
-                  child: const Text(
+                  child: Text(
                     "Olá! Bem-vindo(a) ao app!",
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w100,
-                        backgroundColor: Colors.white),
+                        backgroundColor: Colors.amberAccent[100]),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -86,14 +96,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(15.0),
                   decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.amberAccent[100],
                       borderRadius: BorderRadius.circular(12)),
-                  child: const Text(
+                  child: Text(
                     "Comece a adicionar animes clicando no botão abaixo!",
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w100,
-                        backgroundColor: Colors.white),
+                        backgroundColor: Colors.amberAccent[100]),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -104,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.purple[300],
           onPressed: () {
-            Get.to(() => NewAnimeScreen(hiveDB));
+            Get.to(() => NewAnimeScreen());
           },
           child: const Icon(Icons.add),
         ),
